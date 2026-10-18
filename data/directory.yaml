@@ -3149,6 +3149,35 @@
   checked: 2026-10-16
   searched:
   - search Nexus, ModDB, GitHub and Steam via web search, 2026-10-16, no co-op results
+- game: Resident Evil Requiem
+  year: 2026
+  engine: RE Engine
+  project: (none found)
+  url: ''
+  other_urls: []
+  kind: gap
+  status: none
+  coop_scope:
+    story: unknown
+    enemies: unknown
+    world_state: unknown
+    items: unknown
+  players: unknown
+  networking: unknown
+  open_source: unknown
+  last_activity: unknown
+  qa: none
+  notes: No official co-op and no released co-op mod. Two creators are showing an unreleased co-op mod on YouTube
+    (name, download and source unknown); check it before starting from zero. REFramework loads on the game, so the
+    RE2 and RE4 (2023) co-op mod tooling applies. Reddit not checked.
+  sources:
+  - https://www.destructoid.com/is-resident-evil-requiem-co-op-campaign-and-modes-explained/
+  - https://www.youtube.com/watch?v=jplcHpIAzfI
+  - https://www.youtube.com/watch?v=8ig2SeJ-bVk
+  - https://roadtovr.com/resident-evil-requiem-vr-mod-praydog/
+  checked: 2026-10-18
+  searched:
+  - search Nexus, ModDB, GitHub, Discord and YouTube via web search, 2026-10-18, only the unreleased YouTube project
 - game: Hogwarts Legacy
   year: 2023
   engine: Unreal Engine 4
