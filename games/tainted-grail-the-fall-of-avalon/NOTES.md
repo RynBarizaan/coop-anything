@@ -111,6 +111,36 @@ Results:
   `LoadSaveDomainsCache.GetCachedDomainFileWriteStream` + `SaveDomainFileSize`, outside a save.
 - End of a save: `SaveInProgressHandle.Dispose` (held for the whole `SaveAsync`).
 
+### Remote player body and animation (2026-10-19)
+
+Observations (decompiled code unless marked "tested"):
+
+- The hero's third-person body is the prefab `VHeroController.maleHeroBodyTPP` /
+  `femaleHeroBodyTPP` (male: `HeroMale_TPP`). Tested (component dump of an inactive instance):
+  hero-only components `HeroBodyData`, `ARHeroAnimancer`, `HeroAnimatorClipPlayer`,
+  `VCTppSpineIK`, `VCTppHeroAnimationRigging`, `RigBuilder` (+ 2 `Rig`, 6 `MultiAimConstraint`),
+  `VCHeroRaycaster`; generic visual parts `KandraRig`, 3 `KandraRenderer`,
+  `AnimationPostProcessing`, 14 `MagicaCapsuleCollider`, `CharacterDefaultClothes`,
+  `RenderersMarkers`, `RagdollController`.
+- `ARHeroAnimancer` is wired to the local hero: its `OnAnimatorMove` moves
+  `Hero.Current.VHeroController`, and it reads `Hero.Current` when animations load. A second body
+  must not keep it.
+- `ARAssetReference` holds a single load handle (`LoadAsset` twice logs "already used"); the
+  hero's body is loaded through the reference stored on `VHeroController`. Load other copies
+  through `DeepCopy()`.
+- Hero animation: layers (legs, weapon FSMs, overrides) each play a `HeroStateType`, resolved to
+  clips through `ARHeroStateToAnimationMapping` assets: base mappings plus overrides that items
+  apply on equip. Legs in third person are a 2D mixer fed `Hero.RelativeVelocity` (y, x)
+  (`TppMovementState`). A remote body can replay "state per layer + mixer parameter" through the
+  same mappings.
+- Appearance is `BodyFeatures`, an element any `IWithBodyFeature` owner can carry (hero, NPCs,
+  photo mode's `WorldHeroRenderer`); it serializes on its own and has `CopyFrom`.
+- Photo mode (`WorldHeroRenderer`) already shows a copy of the hero in the world with features,
+  equipped clothes and loadout poses, but is tied to `Hero.Current`.
+- Bot movement: `PlayerInput.ProcessLateUpdate` sets `MoveInput` from Rewired each frame; a
+  postfix that overrides it walks the hero through the game's own movement code (tested).
+- Current area: `World.Services.TryGet<SceneService>()?.ActiveSceneRef?.Name`.
+
 ### Derived (not tested)
 
 - Quest items, keys and readables in a co-op save belong to the same story, so they are kept.
@@ -153,6 +183,11 @@ What TGCoop players report, the cause where its code shows one, and what our des
   is `ID.Contains("QuickSave")`, so a co-op slot can pass for the guest's quicksave. Co-op slots
   need their own IDs.
 
+- **Puppets are bare placeholders** (2026-10-19, presence step 1, by design for now): the other
+  player shows as the default male hero body, bald, in underwear, in the rig's T-pose, sliding
+  along. Female characters also show as male. Next steps: animation, then appearance and
+  equipment. Puppets have no collision and enemies cannot see or hit them.
+
 ### Expected problems (derived, not seen yet)
 
 - **Guest crash or quit without saving loses progress**: a guest's character reaches the host's
@@ -173,6 +208,7 @@ What TGCoop players report, the cause where its code shows one, and what our des
 
 | Date | Milestone | Test | Result |
 |---|---|---|---|
+| 2026-10-19 | Seeing each other, step 1 (playbook stage 2): roster slots, 20 Hz player state (unreliable), host forwards; each remote player is the game's own third-person hero body with the hero-only components removed, snapshot-interpolated 100 ms behind; both directions | `tools/presence-test.ps1` + twin (guest sends nothing: fails on exactly the 4 host-side puppet checks), in `run-suite.ps1` | SUITE: PASS in 659 s (6 cases); guest walked 16.6 m, host's puppet ended 0.08 m away. Puppet is a T-posed default body for now. |
 | 2026-10-19 | Co-op save slots: hosting turns the world into its own co-op slot; on join the host saves it and sends the live world; guests' characters are stored in the host's save (as extra entries the game's domain cache carries through every save) and come back on the next join | `tools/run-suite.ps1`: join, persistence (join, change, save, both quit, rejoin), each with a mutation twin | SUITE: PASS in 470 s (4 cases); guest kept 777 gold across sessions, host 129. |
 | 2026-10-18 | Combined load: guest character merged into the host save inside the game's own Gameplay-domain load (host hero dropped at definitions, guest models with fresh item IDs inserted in its place, one RestoreWorld); co-op save made on the guest reloads cleanly without the earlier save-order patch | `tools/run-suite.ps1`: join + reload (15 checks, incl. real end of loading screen) and twin | SUITE: PASS in 270 s; guest HUD tracks the host world's quest. |
 | 2026-10-18 | Guest joins host over local UDP (LiteNetLib), receives the host's save (chunked, SHA-256 checked), loads it with its own character next to the host, both stable for 30 s | `tools/run-suite.ps1`: join test + mutation twin (join without character must fail on exactly the 3 character checks), two isolated installs on one PC | SUITE: PASS in 191 s, 10/10 checks per case. |
