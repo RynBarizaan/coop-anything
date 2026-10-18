@@ -9,7 +9,7 @@ Raw notes, written as we go. The write-up (README.md) comes later.
 | Store | Steam, app 1466060, beta branch `mono` |
 | Build | buildid 25966682, game version 1.30.102 (`[1.30a]`), saves written by 1.15.033 |
 | Main exe SHA-256 | `e01f1a4cfa8ebb93f7d5c9ea3925cef2883e1d230741ede76ad4f4c7d1bcd594` (`Fall of Avalon.exe`) |
-| Engine | Unity 6000.0.41f1, Mono scripting on the `mono` branch (IL2CPP on the default branch) |
+| Engine | Unity 6000.0.41f1, Mono scripting on the `mono` branch (default branch presumably IL2CPP, per TGCoop's description; not checked) |
 | OS | Windows 11 |
 
 Game code: `<game dir>\Fall of Avalon_Data\Managed\TG.Main.dll` (about 6,200 decompiled files),
