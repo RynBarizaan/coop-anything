@@ -29,6 +29,17 @@ plus `Awaken.*.dll`. Decompiled with ilspycmd 11.1.
     guest after the Odrán dialogue; guest frozen by dialogue during boss fights; combat desync;
     A-pose unless both players use third person; mod dialogue box covers the game's choices.
 
+### Decision: build from zero, not revive TGCoop (owner's decision, recorded 2026-10-19)
+
+Path 2 instead of path 1. Reasons: TGCoop's reported bugs; its way of handling sync and saves
+(each player loads their own save, the host overlays only true story flags, so world state
+outside those hooks can diverge); and visible band-aid fixes in its code ("Guard" patches such
+as `SaveLoadGuard`, `CombatFlagGuard`, `TppIkGuard` that suppress symptoms). Doing it properly
+from scratch looked like the better route. No TGCoop code is used; its audit informed the design
+(host's world is the shared world, guest character merged into the host save on load).
+
+Claimed in https://github.com/cranebeaker/coop-anything/issues/30 (2026-10-19).
+
 ## How the game works (for co-op)
 
 ### Observations (from the decompiled code)
