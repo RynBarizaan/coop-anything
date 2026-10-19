@@ -1,0 +1,11 @@
+# CodeRabbit is switched off for this repo.
+reviews:
+  auto_review:
+    enabled: false
+  high_level_summary: false
+  review_status: false
+  poem: false
+  changed_files_summary: false
+  sequence_diagrams: false
+chat:
+  auto_reply: false

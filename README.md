@@ -31,8 +31,11 @@ Games being made co-op right now: **[Deus Ex](https://github.com/cranebeaker/deu
 From the community: **[Mega Man X](https://github.com/mstan/MegaManXSNESRecomp)** and
 **[Mega Man X4](https://github.com/mstan/MegaManX4Recomp)** (native PC with co-op netplay) ·
 **[Pilotwings 64](https://github.com/NoahVl/Birdman64)** (split-screen) ·
-**Zelda: Oracle of Seasons** ([in progress](https://github.com/cranebeaker/coop-anything/issues/1)) · yours next?
-Community tools: **[DecompPipeline](https://github.com/GeneralAtrox/DecompPipeline)** (agent-driven decompilation of console games, Dreamcast first).
+**[Crab Champions](https://github.com/Dudiebug/CrabMods/blob/main/crabsync/README.md)** · **[Stacklands](https://github.com/Dudiebug/stacklands-coop)** ·
+**[Half Sword](https://github.com/Dudiebug/halfsword-multiplayer-mod)** · **[Enter the Gungeon](https://thunderstore.io/c/enter-the-gungeon/p/GoTeamAlex/Gungeon_Online/)** ·
+**[Clive Barker's Jericho](https://github.com/dolbaras/jericho-coop)** · **[Poppy Playtime](https://github.com/romannazarov057-spec/PoppyCoop)** ·
+**[Divinity II](games/divinity-2-developers-cut)** (split-screen) · **[Command & Conquer 3](games/command-and-conquer-3)** (campaign co-op) ·
+**[Far Cry 2](https://github.com/MortyRei/fc2-coop-probe)** · yours next?
 
 ## Quick start
 
