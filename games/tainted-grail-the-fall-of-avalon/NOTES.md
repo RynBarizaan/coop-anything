@@ -78,15 +78,13 @@ https://github.com/cranebeaker/coop-anything/issues/30 (2026-10-19).
   Whether the January and April mentions are TGCoop's author or another project: unknown.
 - A Nexus comment (2026-07-15) claims its writer built local and online co-op and that "two
   other people made AI versions"; no project, link or build found.
-- Not co-op: RealSkye (Ko-fi) makes Tainted Grail mods (Better UI, Movement, Mounts); the
-  work-in-progress co-op mod listed there is for Dying Light: The Beast (search result text;
-  Ko-fi returns 403 to automated fetches).
-  - Contradiction (2026-10-20): another search summary of the same Ko-fi page describes a
-    work-in-progress co-op mod for Tainted Grail that "enables co-op in the Restored Land",
-    where "both players must load into their Restored Land save first, then join each other
-    using the in-game pause menu". Which game that mod is for: unknown. The page is still 403;
-    no other source names "Restored Land" (searched `RealSkye co-op mod "Restored Land"`,
-    `"Restored Land" game save`). Needs a human to open https://ko-fi.com/realskye.
+- Not co-op: RealSkye (https://ko-fi.com/realskye) makes Tainted Grail mods (Avalon Atlas,
+  Better UI, Better Movement, Better Mounts, Wyrd Sight, Avalon Mod Manager) and No Man's Sky
+  mods. The page, read by the owner on 2026-10-20, lists no co-op mod for any game. (Ko-fi
+  returns 403 to automated fetches. Two search-engine summaries of the page had claimed a
+  co-op work in progress, once for Dying Light: The Beast, once for Tainted Grail "in the
+  Restored Land"; neither is on the page. Search summaries of a page we cannot open are not
+  a source.)
 
 ## Where we looked (2026-10-19)
 
