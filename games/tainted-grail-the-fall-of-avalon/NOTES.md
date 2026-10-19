@@ -200,6 +200,24 @@ Steam Cloud (`tools/steam-cloud-test.ps1` in the mod repo) is written but not ru
 - Whether equipped items, skills and talents all survive the transfer.
 - Which difficulty effects are computed where once enemies are host-driven.
 
+### World design (2026-10-19, owner's decisions)
+
+- Each game's own player is its only `Hero`; a remote player is a stand-in (an NPC the
+  world can see and fight, dressed with the player body). A second real `Hero` per guest on
+  the host was tried and rejected: the hero is built as the local player (views, camera,
+  ~20 runtime parts), so every system needed another exception.
+- The guest's world is a view of the host's, following the playbook's host-authority rule
+  (`playbook/methods.md` 5, from FNV): the host runs every story and world script; a
+  guest's action is a request the host runs; effects on a hero (items, gold, XP) go to the
+  right player by a rules table and are applied there with the game's own calls. No story
+  step may run on a guest (to be a test). A first draft let the guest's game run its own
+  actions, story included; corrected because it contradicts that rule.
+- One area for the whole party to start; downed and revive; no menu pause.
+- Open: what is shared and what is per player (draft table: story, world, NPCs, time
+  shared; inventory, level, stats per player; reputation, crimes, map, reward split
+  proposed); how a story run for a guest reads the guest's stats (the host's hero is
+  `Hero.Current` there).
+
 ## Known and expected bugs
 
 What TGCoop players report, the cause where its code shows one, and what our design must do.
