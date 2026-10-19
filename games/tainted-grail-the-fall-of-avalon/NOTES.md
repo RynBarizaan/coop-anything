@@ -272,9 +272,10 @@ What TGCoop players report, the cause where its code shows one, and what our des
 - **Self-reported player IDs**: characters in the co-op save are keyed by the Steam ID the guest
   sends in its hello, and the host trusts it; a guest could claim another player's character.
   With a Steam transport, use the sender's Steam ID from the Steam network instead.
-- **A newcomer always plays a copy of the host's hero**, gear included (a balance question).
-  Bringing one's own character from a solo save is deferred, maybe never: balance and abuse
-  (items, levels, gold the host's world never gave out). The test bot can (`join --bring`).
+- **A newcomer always plays a copy of the host's hero**, gear included. Placeholder: a
+  first-time guest should create its own character (design open: joining a story that is far
+  along, levels, balance). Bringing one's own character from a solo save is a later option
+  at most (balance, abuse). The test bot can (`join --bring`).
 - **Quest items from stale character files**: a guest file older than the host world may carry items for finished quests.
 - **Duplicate pickups**: both players looting the same container or drop; host must arbitrate.
 - **Time, weather, sleeping, fast travel, wyrdness nights**: world-wide effects one player triggers; host authority needed.
