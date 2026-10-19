@@ -6580,8 +6580,8 @@
   notes: BepInEx 5 + Harmony, needs the game's Steam beta branch "mono". Both players load their own save; the host
     overlays story flags and places NPCs, drops are first grab wins. Latest build 0.5.36 (2026-07-28), no license
     file. Players report softlocks, combat desync and a gate that stays closed for the guest after the Odran dialogue;
-    the author says only Act 1 was really tested. No author reply on Nexus since 2026-07-14. Write-up in
-    games/tainted-grail-the-fall-of-avalon.
+    the author says only Act 1 was really tested. Last author reply on Nexus 2026-07-28, none to the comments
+    from August on. Write-up in games/tainted-grail-the-fall-of-avalon.
   sources:
   - https://www.nexusmods.com/taintedgrailthefallofavalon/mods/211
-  checked: '2026-10-19'
+  checked: '2026-10-20'

@@ -23,8 +23,10 @@ enemies, story and world are not shared yet. It has no release.
   players load their own save; the host pushes the true story flags at join and syncs three
   story calls live, places NPCs, syncs doors and objects; drops are first grab wins.
   Players' reports: gate closed for the teammate after the Odrán dialogue, teammate frozen by
-  dialogue in boss fights, combat desync, A-pose in first person. The author: only Act 1 was
-  really tested. Details and the cause where its code shows one: [NOTES.md](NOTES.md).
+  dialogue in boss fights, combat desync, A-pose in first person, quest rewards for one player
+  only. Fixed in 0.5.36 per the author: enemies far from the host (the game stops simulating
+  them) and host saves silently refused by a stuck combat state. The author: only Act 1 was
+  really tested; last reply on Nexus 2026-07-28. Details and the cause where its code shows one: [NOTES.md](NOTES.md).
 - No other co-op project found; unnamed mentions on the Steam forum and where we looked are
   in [NOTES.md](NOTES.md) ("Existing work", "Where we looked"). The game's Discord was not
   checked.

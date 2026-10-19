@@ -67,6 +67,32 @@ https://github.com/cranebeaker/coop-anything/issues/30 (2026-10-19).
     "buggy mess prone to softlocks". The author (2026-07-14): a hobby project, only Act 1
     really tested; the first-person body pose is reconstructed because the game never
     computes one. No author reply to the September and October comments.
+  - More comments, 2026-07-21 to 2026-08-06 (pasted by the owner 2026-10-20; author replies
+    2026-07-26 to 2026-07-28, none after):
+    - Players: the guest gets stuck running in place near the Archspire teleport (F3, teleport
+      to the host, frees them; 2026-08-06); enemies alive for one player and dead for the
+      other; a boss dead for one only; joining a player who is behind auto-completed their
+      Act 1 quests but the progression flags did not follow; side-quest recipes (blacksmith)
+      and Druid Shrine rewards reach only the player in the dialogue; "general bugs and
+      crashes", fixed by the host quitting and rejoining.
+    - Author, 2026-07-26, two bugs fixed in 0.5.36: (1) "The game stops simulating anything
+      far from your own camera"; the host reported enemies it was not simulating as "attacking
+      nobody", so the guest's AI retargeted them (one monster chasing both players), and the
+      host's frozen health overwrote the guest's hits (enemies "nearly unkillable"). Fix: the
+      host reports "I can't observe this one" and the guest stays in charge of that enemy
+      until the host can see it. (2) "The game refuses to save while it thinks you're in
+      combat"; a phantom attacker stayed latched onto the host, so every save, manual and
+      auto, was refused silently for 4 hours; a host death then lost those hours. "Changing
+      area clears the stuck state."
+    - Author, 2026-07-27: play the prologue alone, then connect; each player keeps their own
+      character, inventory, gold, XP and level, only world and story are shared; both must
+      play or both skip the prologue, else story triggers break ("Caradoc's boat simply
+      refusing to work"); the guest's story "converges toward the host's".
+    - Author, 2026-07-28: version mismatches were only written to the log (fixed: on-screen
+      warning); bosses are a weak spot because "their internal IDs differ per machine and
+      have to be paired by position"; dialogue voice lines are not played for the listener,
+      only text and choices travel; two players are "baked fairly deep" (one partner, one
+      stand-in body, one connection).
   - Derived, not tested: since each player keeps their own world and only those three hooks
     are synced live, world state outside them can drift; a plausible cause of the closed
     gate.
@@ -314,6 +340,13 @@ What TGCoop players report, the cause where its code shows one, and what our des
 | Gate stays closed for the guest; story out of sync | Only `StoryFlags.Set`, quest state and objective state are synced live. (observed in code) | Single host save plus syncing every `ContextualFacts` write. |
 | Mod dialogue box covers the game's choices | UI layout. (player report) | Design the spectator dialogue UI so it never overlaps the local one. |
 | Only 2 players | Hardcoded. | Character files are per player already; start with 2. |
+| Enemies near the guest but far from the host: one monster chases both, enemies "nearly unkillable" | The game stops simulating entities far from the local camera; the host reported its frozen copies as idle and overwrote the guest's damage. Fixed in 0.5.36 by leaving unobserved enemies to the guest. (author's reply) | Not built. Stage 3 must decide what the host does with enemies near a guest and far from itself: keep them simulated on the host, or hand authority over (playbook stage 3: "an authority hand-off rule"). Test: guest fights an enemy far from the host; health goes down and stays down. |
+| Host saves silently refused for hours | The game refuses to save in combat; a phantom attacker kept the host "in combat". Fixed in 0.5.36. (author's reply) | Not built, and a real risk: with host-only saves the host's save is the only copy. Remote-player stand-ins must never stay a combat target after a fight; tell both players on screen when a save is refused. Test: after a fight involving the guest's stand-in, the host can save. |
+| Boss dead for one player only | IDs differ per machine, paired by position. (author's reply) | Same IDs on both sides from the single host save; deaths come from the host (stage 3 exit test). |
+| Quest rewards (recipes, Druid Shrine) only for the player in the dialogue; flags missing after joining a player who is behind | Each player keeps a separate world and hero. (player report; cause a guess) | Partly decided: one world (the host's). Per-player rewards follow DESIGN.md's shared-or-per-player table (open rows). |
+| Guest stuck running in place near the Archspire teleport | Unknown. | Unknown until we reach that area; add to the test route then. |
+| Dialogue voice not heard by the listener | Only text and choices are sent. (author's reply) | Not built (story stage). |
+| Version mismatch only in the log | (author's reply, fixed later) | Our handshake checks versions; whether the guest sees the refusal on screen: unknown, check. |
 
 ### Seen in our own tests
 
