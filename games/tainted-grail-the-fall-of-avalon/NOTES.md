@@ -270,6 +270,37 @@ What TGCoop players report, the cause where its code shows one, and what our des
     the guest's quick save key does nothing yet (should be "save my character"); a host
     save doesn't collect guests' current characters yet.
 
+- **World design findings** (2026-10-19, from the decompiled game; design in the mod's
+  DESIGN.md):
+  - One hero: `Hero.Current` is a static property set by the hero model itself, read 1,190
+    times in 514 files. Enemy noticing (`Perception`) only looks at it; fighting uses the
+    generic `ICharacter` target NPCs use against each other.
+  - Every interaction enters through `AbstractHeroAction.StartInteraction(Hero, interactable)`,
+    every story through `Story.StartStory` and `StoryStep.Execute` (~210 runtime step types),
+    every story flag through `ContextualFacts.Set/Change/Remove`. Actions mix effects in one
+    method (`PickItemAction`: creates the item, records the theft, fills the actor's
+    inventory, may start a dialogue, removes the pickup).
+  - Story triggers fire on physics contact with the local hero's controller (`HeroTrigger`).
+  - IDs are per-type counters saved with the world (`IdStorage`): identical in two games from
+    one save, divergent as soon as either creates something.
+  - Areas are separate save domains (`Domain.Scene`), loaded one at a time.
+  - **Proof, rejected: a second, data-only hero on the host for a guest.** Patching the
+    `Hero.Current` getter at plugin load does reach the game's code (~1,100 reads/s); patched
+    later, already compiled code misses it (inlined). But a hero that is not the local player
+    needs exceptions everywhere: views (controller, camera, HUD, keys, crosshair), ~20
+    runtime parts that assume a body and camera, the wyrd stalker, the world's "only hero"
+    lookups (`World.Only<HeroCombat>` and ~45 more), body bones. With six such exceptions it
+    loaded and the host ran a pickup for it (item in the guest's inventory), but it reacted
+    differently from a played hero, and the pickup's tutorial appeared on the host's screen.
+    Conclusion: the hero is built as the local player; remote players are better stand-ins
+    (the Skyrim Together approach, playbook how-coop-mods-work.md 2.1).
+  - Playbook lesson candidate (phase 8, with the owner's OK): a proof needs a question, a
+    yes/no, a time box and a stop rule written down first; a failure inside a proof is
+    evidence, not a bug to fix. Without that, this proof became a chain of patches.
+  - Test-setup lesson: Harmony compiles patches only in the game; a patch that failed there
+    made a save load fail as "corrupt". The launcher now stops a copy whose plugins report a
+    failed patch before anything loads.
+
 - **Puppets are bare placeholders** (2026-10-19, presence step 1, by design for now): the other
   player shows as the default male hero body, bald, in underwear, in the rig's T-pose, sliding
   along. Female characters also show as male. Next steps: animation, then appearance and
