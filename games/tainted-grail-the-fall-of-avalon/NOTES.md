@@ -86,47 +86,32 @@ https://github.com/cranebeaker/coop-anything/issues/30 (2026-10-19).
   Restored Land"; neither is on the page. Search summaries of a page we cannot open are not
   a source.)
 
-## Where we looked (2026-10-19)
+## Where we looked (2026-10-19, rechecked 2026-10-20)
 
 - This repo: DIRECTORY.md, `games/`, issues and PRs: nothing before our claim.
-- Web search (English): "Tainted Grail Fall of Avalon co-op mod", "multiplayer mod",
-  "coop online mod BepInEx", Reddit co-op threads, TGCoop and its author by name; Polish
-  ("Upadek Avalonu tryb kooperacji mod multiplayer"); Russian ("кооператив мод мультиплеер").
-  Only general articles and the board game (a separate, co-operative product). The search
-  engine indexes Nexus poorly: it did not find TGCoop itself.
+- Web search: English ("Tainted Grail Fall of Avalon co-op mod", "multiplayer mod",
+  "coop online mod BepInEx", Reddit co-op threads, TGCoop and its author by name), Polish
+  ("Upadek Avalonu tryb kooperacji mod multiplayer"), Russian ("кооператив мод мультиплеер");
+  added 2026-10-20: German ("Koop Mod Mehrspieler"), Chinese ("圣杯传说 阿瓦隆的陨落 联机 mod";
+  the Chinese title is 《污痕圣杯:阿瓦隆的陨落》), Japanese ("マルチプレイ 協力 MOD"), "new release
+  October 2026", Steam guides. Only general articles, TGCoop (still 0.5.36, last update
+  2026-07-28, per its Nexus listing in search results) and the board game (a separate,
+  co-operative product). The search engine indexes Nexus poorly.
 - GitHub: repository search ("tainted grail coop/multiplayer", "fall of avalon
-  coop/multiplayer/mod", "TGCoop") and code search (`Awaken.TG.Main`): mod collections and
-  the official toolkit, no co-op.
+  coop/multiplayer/mod", "TGCoop", "avalon coop"), code search (`Awaken.TG.Main`); added
+  2026-10-20: the 30 most recently updated "tainted grail" repos (to 2026-10-19) and topic
+  `tainted-grail`. Mod collections, the official toolkit and single-player mods, no co-op.
+  Several repos named "free full version", "trainer undetected", "cheats" look like download
+  lures: not opened.
 - Nexus: TGCoop's page, comments and files (pages blocked to automated fetches; read by the
   owner and from the downloaded build).
-- Steam forum: search "coop mod" (24 results), threads above.
-- ModDB, Reddit: through web search only, nothing found. Archive.org: not checked (the game
-  is from 2025). The game's Discord: not checked.
-
-## Where we looked (2026-10-20, second pass)
-
-Gaps from the first pass and anything new since then. Nothing new on co-op found.
-
-- Web search: German ("Koop Mod Mehrspieler"), Chinese ("圣杯传说 阿瓦隆的陨落 联机 mod"; the
-  Chinese title is 《污痕圣杯:阿瓦隆的陨落》), Japanese ("マルチプレイ 協力 MOD"), Reddit 2026, "co-op mod
-  new release October 2026", Nexus co-op/multiplayer excluding TGCoop, ModDB (`site:moddb.com`),
-  Steam guides, modding Discord. Only TGCoop (still 0.5.36, last update 2026-07-28, per its
-  Nexus listing in search results) and the board game.
-- Steam threads read: "Add Co-Op" (4630359473422132923): developer kpx_ar, 2024-12-03: "To be
+- Steam forum: search "coop mod" (24 results), threads above. Developer statement found
+  2026-10-20, thread "Add Co-Op" (4630359473422132923), kpx_ar [developer], 2024-12-03: "To be
   honest, that's unlikely to happen. This game was made with a solo-only experience in mind."
-  "Official mod support post launch?" (591772149598913940): nothing on co-op.
 - RPGWatch "mod support" thread (63758): 403 to automated fetches; read by the owner
-  2026-10-20: no co-op or multiplayer project mentioned.
-- GitHub: repos for "tainted grail" sorted by update (30 newest, to 2026-10-19), topic
-  `tainted-grail`, "avalon coop", code search `Awaken.TG.Main`: no co-op. BepInEx mods worth
-  knowing: `keenanselbee/grailwright` (shared build/validation tooling), `Merlynn/TaintedGrail-
-  Companion_Tela` (companion, not read), `ParavozPendos/*` (IL2CPP and Mono). Several repos
-  named "free full version", "trainer undetected", "cheats" look like download lures: not
-  opened.
-- Author's other work: "hektormenta" finds nothing outside the Nexus page.
-- Same engine: covered in the first pass (engine-families.md Unity row).
-- Still not checked: the game's Discord (needs `playbook/discord-export.md` and the owner),
-  archive.org.
+  2026-10-20: no co-op project.
+- ModDB, Reddit: through web search only, nothing found. Archive.org: not checked (the game
+  is from 2025). The game's Discord: not checked (owner's decision, 2026-10-19).
 
 ## Decision: build from zero, not revive TGCoop (owner's decision, recorded 2026-10-19)
 
