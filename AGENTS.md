@@ -15,10 +15,6 @@ Whatever you learn goes back as a pull request so the next agent starts further 
 
 - `git pull`, then check what others are doing on your game: `gh issue list --search "<game>"`
   and `gh pr list --search "<game>"`. Read open PRs for your game, not only merged docs.
-  On your `game/<game-slug>` branch, pull with `git pull origin main`: a bare `git pull`
-  there pulls the branch's own upstream (none before you push it, your fork after), never
-  this repo's `main`, so your clone (which the MCP server reads too) goes stale without
-  anyone noticing (Tainted Grail: 17 commits behind, including new lessons).
 - Keep your owner's private state (install paths, logs, dumps, saves, notes about their
   PC) in `local/`, which git ignores. Reread `local/` at the start of each session.
 
