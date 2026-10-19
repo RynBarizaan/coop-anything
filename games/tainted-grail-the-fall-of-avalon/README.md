@@ -4,8 +4,8 @@
 |---|---|
 | Engine | Unity 6000.0.41f1, Mono scripting on the official Steam beta branch `mono` |
 | Versions tested | Steam, `mono` branch, buildid 25966682, game version 1.30.102 (`[1.30a]`) |
-| Projects | TGCoop, "2 Players Steam Coop" ([Nexus](https://www.nexusmods.com/taintedgrailthefallofavalon/mods/211), directory entry); our own mod, built from zero (not public yet, claim [#30](https://github.com/cranebeaker/coop-anything/issues/30)) |
-| QA level | TGCoop: community-reports. Our mod: automated (two game copies on one PC; joining, saves and seeing each other only) |
+| Projects | TGCoop, "2 Players Steam Coop" ([Nexus](https://www.nexusmods.com/taintedgrailthefallofavalon/mods/211), directory entry) |
+| QA level | TGCoop: community-reports. Our work below: automated (two game copies on one PC; joining, saves and seeing each other only) |
 | Last updated | 2026-10-19 |
 
 ## Where things stand
