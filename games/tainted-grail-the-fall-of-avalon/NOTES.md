@@ -246,8 +246,13 @@ What TGCoop players report, the cause where its code shows one, and what our des
     (decompiled `SteamCloudService` and `SteamNoCloudService` both add `.data`), so it finds
     nothing and returns. The next full save writes the metadata anyway. A first fix patched
     `MetaData.data` in the zip directly (worked, but behind Steam Cloud's back); replaced.
-  - Possibly superseded: the owner is deciding on host-only saves, where the guest never keeps
-    the co-op world as a slot at all.
+  - To be superseded: the owner decided on host-only saves (2026-10-19), where the guest never
+    keeps the co-op world as a slot at all. Not built yet.
+
+- **Rejoining silently drops a guest's solo progress** (2026-10-19, read from the code, not
+  tested): a guest that plays its `Coop_<host file>` slot alone and then rejoins gets the
+  slot replaced by the host's world, and plays the character from the host's save. No
+  warning. Goes away with host-only saves, where there is no guest slot to play alone.
 
 - **Puppets are bare placeholders** (2026-10-19, presence step 1, by design for now): the other
   player shows as the default male hero body, bald, in underwear, in the rig's T-pose, sliding
@@ -267,8 +272,9 @@ What TGCoop players report, the cause where its code shows one, and what our des
 - **Self-reported player IDs**: characters in the co-op save are keyed by the Steam ID the guest
   sends in its hello, and the host trusts it; a guest could claim another player's character.
   With a Steam transport, use the sender's Steam ID from the Steam network instead.
-- **A newcomer always plays a copy of the host's hero**: there is no player-facing way yet to
-  bring one's own character (the test bot can, `join --bring`).
+- **A newcomer always plays a copy of the host's hero**, gear included (a balance question).
+  Bringing one's own character from a solo save is deferred, maybe never: balance and abuse
+  (items, levels, gold the host's world never gave out). The test bot can (`join --bring`).
 - **Quest items from stale character files**: a guest file older than the host world may carry items for finished quests.
 - **Duplicate pickups**: both players looting the same container or drop; host must arbitrate.
 - **Time, weather, sleeping, fast travel, wyrdness nights**: world-wide effects one player triggers; host authority needed.
