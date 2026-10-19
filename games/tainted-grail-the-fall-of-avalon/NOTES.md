@@ -1,35 +1,105 @@
 # Tainted Grail: The Fall of Avalon: working notes
 
-Raw notes, written as we go. The write-up (README.md) comes later.
+Raw notes, written as we go; the write-up is README.md. Claimed in
+https://github.com/cranebeaker/coop-anything/issues/30 (2026-10-19).
 
-## Game identity
+## Triage (playbook/triage.md)
 
-| | |
-|---|---|
-| Store | Steam, app 1466060, beta branch `mono` |
-| Build | buildid 25966682, game version 1.30.102 (`[1.30a]`), saves written by 1.15.033 |
-| Main exe SHA-256 | `e01f1a4cfa8ebb93f7d5c9ea3925cef2883e1d230741ede76ad4f4c7d1bcd594` (`Fall of Avalon.exe`) |
-| Engine | Unity 6000.0.41f1, Mono scripting on the `mono` branch (default branch presumably IL2CPP, per TGCoop's description; not checked) |
-| OS | Windows 11 |
+1. **Which game.** Tainted Grail: The Fall of Avalon (Questline / Awaken Realms, PC).
 
-Game code: `<game dir>\Fall of Avalon_Data\Managed\TG.Main.dll` (about 6,200 decompiled files),
-plus `Awaken.*.dll`. Decompiled with ilspycmd 11.1.
+   | | |
+   |---|---|
+   | Store | Steam, app 1466060, beta branch `mono` |
+   | Build | buildid 25966682, game version 1.30.102 (`[1.30a]`) |
+   | Main exe SHA-256 | `e01f1a4cfa8ebb93f7d5c9ea3925cef2883e1d230741ede76ad4f4c7d1bcd594` (`Fall of Avalon.exe`) |
+   | Engine | Unity 6000.0.41f1, Mono scripting on the `mono` branch |
+   | OS | Windows 11 |
+
+   The default Steam branch is presumably IL2CPP (TGCoop's description says BepInEx 5 can't
+   hook it); not checked by us. The `mono` branch is an official Steam beta, so a co-op mod
+   for it needs no game patching beyond the mod loader.
+2. **Already done?** One co-op mod exists, TGCoop (below). Nothing in this repo before our
+   claim.
+3. **Engine.** Unity, Mono scripting backend (`Fall of Avalon_Data\Managed\`, 279 DLLs; the
+   game log says "[Modding] Mono build"). Game code in `TG.Main.dll` plus `Awaken.*.dll`.
+   Unity co-op mods for other games (Nitrox, HKMP, QSB, CelesteNet in
+   playbook/engine-families.md) show the usual BepInEx/Harmony route; none target this game.
+4. **How much source.** Closed binary, but Mono: the managed DLLs decompile to readable C#
+   with original names (ilspycmd 11.1, about 6,200 files for `TG.Main`). BepInEx 5 +
+   Harmony load and patch it. The developer also publishes an official modding toolkit,
+   [AR-Questline/merlin-workshop](https://github.com/AR-Questline/merlin-workshop), a Unity
+   project with "a simplified version of the game's source code". It makes **asset and data
+   mods only**: it "allows you to replace Addressables assets" (asset bundles, `catalog.json`,
+   `mod.meta` in `%USERPROFILE%\AppData\LocalLow\Questline\Fall of Avalon\Mods`), so it
+   cannot carry a co-op mod's code. Its license is an EULA for the open-beta tool
+   ("by using the Tool, you agree"): free use solely for making mods for the game, no
+   profit, no sharing or modifying the tool itself, no reverse engineering or decompiling
+   the tool or the game. We did not use it.
+5. **Multiplayer in the engine.** None. The game ships Steamworks.NET and Heathen (Steam
+   features, cloud saves), GOG Galaxy, and Unity's engine module `UnityEngine.MultiplayerModule`,
+   but no networking library. A moderator on the Steam forum: "There will not be any form of
+   multiplayer in this game" (thread 686368595766265552). So co-op means building a sync layer
+   with host authority.
+6. **Shipping.** A BepInEx plugin ships without game files. No anti-cheat in the install
+   (no EasyAntiCheat or BattlEye folder) and no online service. The game sends automatic bug
+   reports with saves attached when a load fails (Unity User Reporting): block them in test
+   copies.
 
 ## Existing work
 
-- **TGCoop** ("2 Players Steam Coop"), https://www.nexusmods.com/taintedgrailthefallofavalon/mods/211.
-  BepInEx 5 + Harmony, 2 players, Steam lobbies and SteamNetworkingMessages on the game's own app
-  id, host authority. Latest build seen: 0.5.36 (2026-07-28). No license file. Author's last reply
-  on Nexus 2026-07-14; later comments report softlocks and no fixes.
-  - Session model (from its readme): both players load their own save, then the guest joins.
+- **TGCoop** ("2 Players Steam Coop"), https://www.nexusmods.com/taintedgrailthefallofavalon/mods/211,
+  author hektormenta. BepInEx 5 + Harmony, 2 players, Steam lobbies and
+  SteamNetworkingMessages on the game's own app id, host authority. Newest build we saw:
+  0.5.36 (`TGCoop.dll` dated 2026-07-28; zip SHA-256
+  `6a4c372e82b026668e7e75fe0d93ad771b5ce0f83140bd72a5a0ea65315d272e`). No license file, no
+  source; readme in Spanish. The page states it was built with AI assistance.
+  - Session model (its readme): both players load their own save, then the guest joins and
+    the host pushes a baseline.
   - Story sync (from reading the decompiled DLL): live hooks on `StoryFlags.Set`,
     `QuestUtils.SetQuestState`, `QuestUtils.ChangeObjectiveState`; on join the host sends only
-    the true boolean facts of each memory context.
-  - Bugs reported by players (Nexus comments, July to October 2026): gate stays closed for the
-    guest after the Odrán dialogue; guest frozen by dialogue during boss fights; combat desync;
-    A-pose unless both players use third person; mod dialogue box covers the game's choices.
+    the true boolean facts of each memory context. Other writes to the game's flag store
+    (`GameplayMemory` → `ContextualFacts`: NPC actor states, discarded places, story
+    variables, visited scenes) and false or non-boolean values are not synced.
+  - Bug reports (Nexus comments, July to October 2026): after the Odrán dialogue the fortress
+    gate stays closed for the teammate; dialogue started in a boss fight locks the teammate's
+    movement until a rejoin; constant combat desync (flickering, teleporting); A-pose unless
+    both players use third person; the mod's dialogue box covers the game's choices;
+    "buggy mess prone to softlocks". The author (2026-07-14): a hobby project, only Act 1
+    really tested; the first-person body pose is reconstructed because the game never
+    computes one. No author reply to the September and October comments.
+  - Derived, not tested: since each player keeps their own world and only those three hooks
+    are synced live, world state outside them can drift; a plausible cause of the closed
+    gate.
+- Mentions without a name: a Steam forum moderator in January (year not shown, presumably
+  2026): "Afaik someone is working on a multiplayer mod, but no idea how far along that one
+  is" (thread 686368595766265552); a player in April: "Check out the discord mod chat
+  channel. There is someone working on it" (thread 796712917458249380); later posts about a
+  BepInEx co-op mod on Nexus (585058364697005929, 589558792744841182), presumably TGCoop.
+  Whether the January and April mentions are TGCoop's author or another project: unknown.
+- A Nexus comment (2026-07-15) claims its writer built local and online co-op and that "two
+  other people made AI versions"; no project, link or build found.
+- Not co-op: RealSkye (Ko-fi) makes Tainted Grail mods (Better UI, Movement, Mounts); the
+  work-in-progress co-op mod listed there is for Dying Light: The Beast (search result text;
+  Ko-fi returns 403 to automated fetches).
 
-### Decision: build from zero, not revive TGCoop (owner's decision, recorded 2026-10-19)
+## Where we looked (2026-10-19)
+
+- This repo: DIRECTORY.md, `games/`, issues and PRs: nothing before our claim.
+- Web search (English): "Tainted Grail Fall of Avalon co-op mod", "multiplayer mod",
+  "coop online mod BepInEx", Reddit co-op threads, TGCoop and its author by name; Polish
+  ("Upadek Avalonu tryb kooperacji mod multiplayer"); Russian ("кооператив мод мультиплеер").
+  Only general articles and the board game (a separate, co-operative product). The search
+  engine indexes Nexus poorly: it did not find TGCoop itself.
+- GitHub: repository search ("tainted grail coop/multiplayer", "fall of avalon
+  coop/multiplayer/mod", "TGCoop") and code search (`Awaken.TG.Main`): mod collections and
+  the official toolkit, no co-op.
+- Nexus: TGCoop's page, comments and files (pages blocked to automated fetches; read by the
+  owner and from the downloaded build).
+- Steam forum: search "coop mod" (24 results), threads above.
+- ModDB, Reddit: through web search only, nothing found. Archive.org: not checked (the game
+  is from 2025). The game's Discord: not checked.
+
+## Decision: build from zero, not revive TGCoop (owner's decision, recorded 2026-10-19)
 
 Path 2 instead of path 1. Reasons: TGCoop's reported bugs; its way of handling sync and saves
 (each player loads their own save, the host overlays only true story flags, so world state
@@ -37,8 +107,6 @@ outside those hooks can diverge); and visible band-aid fixes in its code ("Guard
 as `SaveLoadGuard`, `CombatFlagGuard`, `TppIkGuard` that suppress symptoms). Doing it properly
 from scratch looked like the better route. No TGCoop code is used; its audit informed the design
 (host's world is the shared world, guest character merged into the host save on load).
-
-Claimed in https://github.com/cranebeaker/coop-anything/issues/30 (2026-10-19).
 
 ## How the game works (for co-op)
 
@@ -351,6 +419,7 @@ What TGCoop players report, the cause where its code shows one, and what our des
 
 | Date | Milestone | Test | Result |
 |---|---|---|---|
+| 2026-10-19 | Scorer self-test (playbook automated-qa.md, "Test the scorer, not only the test"): known good and bad session outputs, made by the test library's own functions, go through the real scorer first in every suite run | 9 cases; against the old scorer it failed exactly the 2 predicted holes (a run, or a twin run, with checks missing counted as a pass) | Fixed; Full: SUITE: PASS in 614 s, every run ran all its checks (main 40/40, bad network 31/31, twin runs failed on exactly their 17 and 1 listed checks). |
 | 2026-10-19 | Testing gaps from the playbook filled: bad network (relay, 100 ms each way, 20 ms jitter, 5% loss) and exit (guest quits through the game's exit, host sees it leave, host quits, no crash report) | `run-suite.ps1 -Full`: new bad-network run; exit ends every run; twins "guest crashes" and "relay clean" | Over a real 108 ms / 5.1% loss link all in-session checks pass; host noticed the guest's exit by timeout. SUITE: PASS in 457 s (3 runs; twin run failed on exactly its 12 listed checks). |
 | 2026-10-19 | Test suite restructured: one shared session runs every feature's checks; only save/reload and persistence restart games; twins with independent switches share one run; tiers `-Quick` / `-Full`; save folders reset to a pinned baseline each run | `tools/run-suite.ps1 -Quick` and `-Full`, same checks and twin expectations as before (duplicates merged) | Quick: SUITE: PASS in 95 s (22 checks). Full: SUITE: PASS in 327 s (main 34/34; twin run failed on exactly its 10 listed checks), was 659 s. |
 | 2026-10-19 | Seeing each other, step 1 (playbook stage 2): roster slots, 20 Hz player state (unreliable), host forwards; each remote player is the game's own third-person hero body with the hero-only components removed, snapshot-interpolated 100 ms behind; both directions | `tools/presence-test.ps1` + twin (guest sends nothing: fails on exactly the 4 host-side puppet checks), in `run-suite.ps1` | SUITE: PASS in 659 s (6 cases); guest walked 16.6 m, host's puppet ended 0.08 m away. Puppet is a T-posed default body for now. |
@@ -428,3 +497,6 @@ What TGCoop players report, the cause where its code shows one, and what our des
 - Automating the title screen: wait for `TitleScreenUI.SpawnTitleScreenUI`; loading earlier
   leaves the title menu drawn over gameplay for the rest of the session. "Press any button" can be
   skipped by setting `TitleScreenUI.s_shownFocusPopup`.
+- Windows PowerShell 5.1 test scripts started from a PowerShell 7 environment (here: an agent
+  shell) inherit its `PSModulePath`, load the wrong modules and miss built-in commands
+  (`Get-FileHash`); every run aborted. Clear `PSModulePath` before starting 5.1.

@@ -6558,3 +6558,29 @@
   - https://www.nexusmods.com/farcry2/mods/368
   - https://steamcommunity.com/app/19900/discussions/0/864973123475897875
   checked: '2026-10-19'
+- game: 'Tainted Grail: The Fall of Avalon'
+  year: 2025
+  engine: Unity
+  project: 2 Players Steam Coop (TGCoop)
+  url: https://www.nexusmods.com/taintedgrailthefallofavalon/mods/211
+  other_urls: []
+  kind: mod
+  status: alpha
+  coop_scope:
+    players_visible: 'yes'
+    story: partial
+    enemies: partial
+    world_state: partial
+    items: per-player
+  players: '2'
+  networking: steam-relay
+  open_source: 'no'
+  last_activity: 2026-07
+  qa: community-reports
+  notes: BepInEx 5 + Harmony, needs the game's Steam beta branch "mono". Both players load their own save; the host
+    overlays story flags and places NPCs, drops are first grab wins. Latest build 0.5.36 (2026-07-28), no license
+    file. Players report softlocks, combat desync and a gate that stays closed for the guest after the Odran dialogue;
+    the author says only Act 1 was really tested. Write-up in games/tainted-grail-the-fall-of-avalon.
+  sources:
+  - https://www.nexusmods.com/taintedgrailthefallofavalon/mods/211
+  checked: '2026-10-19'
