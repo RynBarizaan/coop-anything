@@ -197,7 +197,18 @@ What TGCoop players report, the cause where its code shows one, and what our des
   and collides with the guest's own slot of that number. Seen at the guest's title scan:
   `Slot_38 file=Slot_31`, `Slot_35 file=QuickSave_6` (a leftover from the old design). The mod
   finds slots by file name and is not affected; a test that loaded by ID loaded the wrong slot
-  after a restart. Fix: register the received slot under a fresh ID from the guest's game.
+  after a restart. **Fixed 2026-10-19**: while loading the received slot's metadata the game
+  already gives it a fresh ID on a collision (`SaveSlot.EnsureIdIsValid`, in memory only);
+  the guest now writes that ID into the received zip. Test: the guest owns a slot with the
+  host's ID; after receiving, the zip's `MetaData.data` must hold the guest's new ID (twin:
+  the write is off, the check fails).
+  - Game finding on the way: `SaveSlot.ApplyChanges` (what renaming a slot calls) never
+    writes to a slot on PC. `LoadSave.SaveMetadataDomainSynchronous` loads
+    `Saved/<file>.data` through the cloud service, but slots are `Saved/<file>.zip`
+    (decompiled `SteamCloudService` and `SteamNoCloudService` both add `.data`), so it finds
+    nothing and returns. The next full save writes the metadata anyway. Write the entry
+    yourself: serialize with `LoadSave.TrySerializeMetaDomain` (private) and replace
+    `MetaData.data` in the zip.
 
 - **Puppets are bare placeholders** (2026-10-19, presence step 1, by design for now): the other
   player shows as the default male hero body, bald, in underwear, in the rig's T-pose, sliding
