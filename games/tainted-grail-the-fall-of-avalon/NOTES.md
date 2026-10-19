@@ -246,13 +246,29 @@ What TGCoop players report, the cause where its code shows one, and what our des
     (decompiled `SteamCloudService` and `SteamNoCloudService` both add `.data`), so it finds
     nothing and returns. The next full save writes the metadata anyway. A first fix patched
     `MetaData.data` in the zip directly (worked, but behind Steam Cloud's back); replaced.
-  - To be superseded: the owner decided on host-only saves (2026-10-19), where the guest never
-    keeps the co-op world as a slot at all. Not built yet.
+  - Superseded the same day by host-only saves: the guest no longer stores the world at all.
 
-- **Rejoining silently drops a guest's solo progress** (2026-10-19, read from the code, not
-  tested): a guest that plays its `Coop_<host file>` slot alone and then rejoins gets the
-  slot replaced by the host's world, and plays the character from the host's save. No
-  warning. Goes away with host-only saves, where there is no guest slot to play alone.
+- **Host-only saves** (2026-10-19, owner's decision, built): the host's co-op save is the only
+  permanent copy. The guest keeps the received world in memory: a slot is made from the
+  metadata in the received bytes, and a Harmony prefix on `ZipArchiveUtils.LoadArchive` (where
+  Steam's cloud services open a slot zip) serves it from memory, so the game's own load runs
+  unchanged. The guest's game can't save: the game's own `SaveBlocker` model (used by duels,
+  boss fights) stops player, quick and auto saves but not the domain caching on area changes.
+  The guest's "save my character" sends its character; the host saves at once only if it
+  could save by hand (`LoadSave.CanPlayerSave`), else at its next save. Tested: the guest's
+  save folder is byte-identical to its baseline after a session; quick save refused.
+  - Replaced bug class: rejoining used to silently drop a guest's solo progress in its
+    `Coop_` slot. Gone, since there is no guest slot.
+  - Game finding: `LoadSave.Save` itself ignores save blockers (only the `Can*Save` checks and
+    the menus look at them); `SavePostpone` is the only check inside `Save`.
+  - Game finding: saving needs `Hero.Grounded`, which is false while swimming: the movement
+    system zeroes vertical velocity in water, the character controller reports no ground,
+    and the 0.5 s ground-touched timer runs out (`VHeroController.UpdateGroundTouchedTimeout`),
+    although the ground sphere check still hits. The test bots' walks on the prologue beach
+    sometimes end in water, so a test that needs the host to save must put it on land first.
+  - Gaps: GOG's cloud service opens slots differently (a received world would not load);
+    the guest's quick save key does nothing yet (should be "save my character"); a host
+    save doesn't collect guests' current characters yet.
 
 - **Puppets are bare placeholders** (2026-10-19, presence step 1, by design for now): the other
   player shows as the default male hero body, bald, in underwear, in the rig's T-pose, sliding
