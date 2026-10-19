@@ -152,6 +152,42 @@ Observations (decompiled code unless marked "tested"):
   postfix that overrides it walks the hero through the game's own movement code (tested).
 - Current area: `World.Services.TryGet<SceneService>()?.ActiveSceneRef?.Name`.
 
+### Steam Cloud (from the decompiled code, 2026-10-19)
+
+Observed in the code (`Saving/Cloud/Services/*`, `Saving/Cloud/SteamCloudOrigin.cs`):
+- The game picks `SteamCloudService` when Steam Cloud is on for the user, else
+  `SteamNoCloudService` (`CloudService.CreateCloudService`); GOG has its own service. All save
+  reads and writes go through it. The game uses the Steam API itself (`ISteamRemoteStorage`
+  through Heathen's wrapper): saves are `Saved/<file>.zip`, settings `Saved/PlayerPrefs.data`.
+- A save is `BeginSave(slot ID)`, `SaveSlotFile` per entry (stored as `<name>.data`),
+  `EndSave(file name)`; under Steam Cloud `EndSave` also uploads. `LoadSave.Save` pauses Steam
+  callbacks (`App.canRunCallbacks`) and `SavingWorldMarker` ends with `EndSaveBatch` and
+  `PrefMemory.Save`.
+- Each machine keeps a record of synced files with both timestamps (`SteamCloudOrigin`, in
+  the *unsynchronized* prefs, `Unsynchronized/PlayerPrefs.data`, plain JSON). Writes update it
+  in memory; `PrefMemory.Save` stores it.
+- Startup sync (`InitCloud`), per file: local only and no record → upload; cloud only and no
+  record → download; cloud only and the record knows it → **deleted from the cloud** (taken as
+  deleted on this machine); local only and the record knows it → **deleted locally** (unless
+  the local copy is newer: conflict); both present and no record → conflict dialog; both
+  changed since the record → conflict dialog.
+
+Derived (for mods and test setups):
+- Write saves only through the cloud service and end with `PrefMemory.Save`; a file added or
+  removed behind the game's back is uploaded, deleted or a conflict at the next startup.
+- A test copy with Steam Cloud on needs a data folder of its own that is never used without
+  Steam Cloud (its record and its files must stay in step).
+- A guest's received save carries the host's large-file references
+  (`SaveSlot.usedLargeFilesIndices`, `lf_*` files via `LargeFilesStorage`); they mean nothing
+  on the guest. Deleting that save runs `RemoveSaveSlotUsedFilesData`, which could remove a
+  guest's own large file of the same index. Unknown what writes large files; none existed on
+  the test PC (searched 2026-10-19).
+
+Unknown: whether Steam also runs Auto-Cloud for this game's save folder (the NieR: Automata
+notes saw Auto-Cloud upload a test copy's folder on exit). The test copies' folders are
+redirected, so Auto-Cloud on the real folder would not see them. A one-off test on a real
+Steam Cloud (`tools/steam-cloud-test.ps1` in the mod repo) is written but not run yet.
+
 ### Derived (not tested)
 
 - Quest items, keys and readables in a co-op save belong to the same story, so they are kept.
@@ -198,17 +234,20 @@ What TGCoop players report, the cause where its code shows one, and what our des
   `Slot_38 file=Slot_31`, `Slot_35 file=QuickSave_6` (a leftover from the old design). The mod
   finds slots by file name and is not affected; a test that loaded by ID loaded the wrong slot
   after a restart. **Fixed 2026-10-19**: while loading the received slot's metadata the game
-  already gives it a fresh ID on a collision (`SaveSlot.EnsureIdIsValid`, in memory only);
-  the guest now writes that ID into the received zip. Test: the guest owns a slot with the
-  host's ID; after receiving, the zip's `MetaData.data` must hold the guest's new ID (twin:
-  the write is off, the check fails).
+  already gives it a fresh ID on a collision (`SaveSlot.EnsureIdIsValid`, in memory only).
+  The guest now reads the metadata from the received bytes and writes the whole slot through
+  the cloud service as the game's own save does, with freshly serialized metadata holding the
+  new ID (see "Steam Cloud" below). Test: the guest owns a slot with the host's ID; after
+  receiving, the zip's `MetaData.data` must hold the guest's new ID (twin: the host's
+  metadata is stored unchanged, the check fails). Full suite passes.
   - Game finding on the way: `SaveSlot.ApplyChanges` (what renaming a slot calls) never
     writes to a slot on PC. `LoadSave.SaveMetadataDomainSynchronous` loads
     `Saved/<file>.data` through the cloud service, but slots are `Saved/<file>.zip`
     (decompiled `SteamCloudService` and `SteamNoCloudService` both add `.data`), so it finds
-    nothing and returns. The next full save writes the metadata anyway. Write the entry
-    yourself: serialize with `LoadSave.TrySerializeMetaDomain` (private) and replace
-    `MetaData.data` in the zip.
+    nothing and returns. The next full save writes the metadata anyway. A first fix patched
+    `MetaData.data` in the zip directly (worked, but behind Steam Cloud's back); replaced.
+  - Possibly superseded: the owner is deciding on host-only saves, where the guest never keeps
+    the co-op world as a slot at all.
 
 - **Puppets are bare placeholders** (2026-10-19, presence step 1, by design for now): the other
   player shows as the default male hero body, bald, in underwear, in the rig's T-pose, sliding
@@ -225,6 +264,11 @@ What TGCoop players report, the cause where its code shows one, and what our des
 - **Enemy targeting with two players**: enemy AI knows only `Hero.Current`; on the host the guest is a puppet. The puppet must become a valid target (attackable, aggro, line of sight) or enemies will ignore the guest.
 - **Damage and difficulty**: difficulty multiplies damage dealt and received, stamina and mana use (`Difficulty.DamageDealt/DamageReceived/...`, applied to NPCs via `NpcDifficultyStatModifier`). Hits the guest lands are resolved on the host with the host's difficulty; damage to the guest must use the guest's armour and stats. Decide whether enemies scale with player count.
 - **Survival and Challenge difficulty**: save restrictions and a locked hero element; block in co-op at first.
+- **Self-reported player IDs**: characters in the co-op save are keyed by the Steam ID the guest
+  sends in its hello, and the host trusts it; a guest could claim another player's character.
+  With a Steam transport, use the sender's Steam ID from the Steam network instead.
+- **A newcomer always plays a copy of the host's hero**: there is no player-facing way yet to
+  bring one's own character (the test bot can, `join --bring`).
 - **Quest items from stale character files**: a guest file older than the host world may carry items for finished quests.
 - **Duplicate pickups**: both players looting the same container or drop; host must arbitrate.
 - **Time, weather, sleeping, fast travel, wyrdness nights**: world-wide effects one player triggers; host authority needed.
