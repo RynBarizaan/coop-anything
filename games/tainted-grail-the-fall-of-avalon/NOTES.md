@@ -192,7 +192,12 @@ What TGCoop players report, the cause where its code shows one, and what our des
   its metadata ID is the host's `QuickSave_6`. At the guest's title scan two slots claim that ID;
   the game renames whichever loads second (alphabetical file order), and `SaveSlot.IsQuickSave`
   is `ID.Contains("QuickSave")`, so a co-op slot can pass for the guest's quicksave. Co-op slots
-  need their own IDs.
+  need their own IDs. Still open (2026-10-19): since co-op save slots the host always sends a
+  `Slot_N`, so the quicksave case is gone, but the received slot still keeps the host's `Slot_N`
+  and collides with the guest's own slot of that number. Seen at the guest's title scan:
+  `Slot_38 file=Slot_31`, `Slot_35 file=QuickSave_6` (a leftover from the old design). The mod
+  finds slots by file name and is not affected; a test that loaded by ID loaded the wrong slot
+  after a restart. Fix: register the received slot under a fresh ID from the guest's game.
 
 - **Puppets are bare placeholders** (2026-10-19, presence step 1, by design for now): the other
   player shows as the default male hero body, bald, in underwear, in the rig's T-pose, sliding
@@ -219,12 +224,24 @@ What TGCoop players report, the cause where its code shows one, and what our des
 
 | Date | Milestone | Test | Result |
 |---|---|---|---|
+| 2026-10-19 | Test suite restructured: one shared session runs every feature's checks; only save/reload and persistence restart games; twins with independent switches share one run; tiers `-Quick` / `-Full`; save folders reset to a pinned baseline each run | `tools/run-suite.ps1 -Quick` and `-Full`, same checks and twin expectations as before (duplicates merged) | Quick: SUITE: PASS in 95 s (22 checks). Full: SUITE: PASS in 327 s (main 34/34; twin run failed on exactly its 10 listed checks), was 659 s. |
 | 2026-10-19 | Seeing each other, step 1 (playbook stage 2): roster slots, 20 Hz player state (unreliable), host forwards; each remote player is the game's own third-person hero body with the hero-only components removed, snapshot-interpolated 100 ms behind; both directions | `tools/presence-test.ps1` + twin (guest sends nothing: fails on exactly the 4 host-side puppet checks), in `run-suite.ps1` | SUITE: PASS in 659 s (6 cases); guest walked 16.6 m, host's puppet ended 0.08 m away. Puppet is a T-posed default body for now. |
 | 2026-10-19 | Co-op save slots: hosting turns the world into its own co-op slot; on join the host saves it and sends the live world; guests' characters are stored in the host's save (as extra entries the game's domain cache carries through every save) and come back on the next join | `tools/run-suite.ps1`: join, persistence (join, change, save, both quit, rejoin), each with a mutation twin | SUITE: PASS in 470 s (4 cases); guest kept 777 gold across sessions, host 129. |
 | 2026-10-18 | Combined load: guest character merged into the host save inside the game's own Gameplay-domain load (host hero dropped at definitions, guest models with fresh item IDs inserted in its place, one RestoreWorld); co-op save made on the guest reloads cleanly without the earlier save-order patch | `tools/run-suite.ps1`: join + reload (15 checks, incl. real end of loading screen) and twin | SUITE: PASS in 270 s; guest HUD tracks the host world's quest. |
 | 2026-10-18 | Guest joins host over local UDP (LiteNetLib), receives the host's save (chunked, SHA-256 checked), loads it with its own character next to the host, both stable for 30 s | `tools/run-suite.ps1`: join test + mutation twin (join without character must fail on exactly the 3 character checks), two isolated installs on one PC | SUITE: PASS in 191 s, 10/10 checks per case. |
 
 ## Test setup lessons
+
+- **Game launches dominate test time** (about 45 s per session start; checks take seconds).
+  Run many features' checks in one shared session and restart games only for tests that need
+  a quit (save and reload, rejoin). Twins whose switches cannot affect each other's checks can
+  share one run; the run must fail on exactly the union of their checks.
+- **Address save slots by file name in tests, never by slot ID**: the game reassigns IDs at
+  startup when two slots claim one, so an ID can name a different slot after a restart. And
+  reset test save folders to a pinned baseline at the start of each run, or slots from earlier
+  runs pile up and cause those collisions.
+- Windows PowerShell 5.1 variable names ignore case: a `[string]$Restarts` parameter and a
+  `$restarts` list are one variable, and the type constraint turns the list into a string.
 
 - The test copy shares `%USERPROFILE%\AppData\LocalLow\Questline\Fall of Avalon` with the real
   install, and the game repacks saves on first launch of this build. Redirect the data folder
