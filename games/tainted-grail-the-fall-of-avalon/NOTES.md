@@ -115,7 +115,8 @@ Gaps from the first pass and anything new since then. Nothing new on co-op found
 - Steam threads read: "Add Co-Op" (4630359473422132923): developer kpx_ar, 2024-12-03: "To be
   honest, that's unlikely to happen. This game was made with a solo-only experience in mind."
   "Official mod support post launch?" (591772149598913940): nothing on co-op.
-- RPGWatch "mod support" thread: 403 to automated fetches, not read.
+- RPGWatch "mod support" thread (63758): 403 to automated fetches; read by the owner
+  2026-10-20: no co-op or multiplayer project mentioned.
 - GitHub: repos for "tainted grail" sorted by update (30 newest, to 2026-10-19), topic
   `tainted-grail`, "avalon coop", code search `Awaken.TG.Main`: no co-op. BepInEx mods worth
   knowing: `keenanselbee/grailwright` (shared build/validation tooling), `Merlynn/TaintedGrail-
