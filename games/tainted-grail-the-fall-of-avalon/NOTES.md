@@ -81,6 +81,12 @@ https://github.com/cranebeaker/coop-anything/issues/30 (2026-10-19).
 - Not co-op: RealSkye (Ko-fi) makes Tainted Grail mods (Better UI, Movement, Mounts); the
   work-in-progress co-op mod listed there is for Dying Light: The Beast (search result text;
   Ko-fi returns 403 to automated fetches).
+  - Contradiction (2026-10-20): another search summary of the same Ko-fi page describes a
+    work-in-progress co-op mod for Tainted Grail that "enables co-op in the Restored Land",
+    where "both players must load into their Restored Land save first, then join each other
+    using the in-game pause menu". Which game that mod is for: unknown. The page is still 403;
+    no other source names "Restored Land" (searched `RealSkye co-op mod "Restored Land"`,
+    `"Restored Land" game save`). Needs a human to open https://ko-fi.com/realskye.
 
 ## Where we looked (2026-10-19)
 
@@ -98,6 +104,30 @@ https://github.com/cranebeaker/coop-anything/issues/30 (2026-10-19).
 - Steam forum: search "coop mod" (24 results), threads above.
 - ModDB, Reddit: through web search only, nothing found. Archive.org: not checked (the game
   is from 2025). The game's Discord: not checked.
+
+## Where we looked (2026-10-20, second pass)
+
+Gaps from the first pass and anything new since then. Nothing new on co-op found.
+
+- Web search: German ("Koop Mod Mehrspieler"), Chinese ("圣杯传说 阿瓦隆的陨落 联机 mod"; the
+  Chinese title is 《污痕圣杯:阿瓦隆的陨落》), Japanese ("マルチプレイ 協力 MOD"), Reddit 2026, "co-op mod
+  new release October 2026", Nexus co-op/multiplayer excluding TGCoop, ModDB (`site:moddb.com`),
+  Steam guides, modding Discord. Only TGCoop (still 0.5.36, last update 2026-07-28, per its
+  Nexus listing in search results) and the board game.
+- Steam threads read: "Add Co-Op" (4630359473422132923): developer kpx_ar, 2024-12-03: "To be
+  honest, that's unlikely to happen. This game was made with a solo-only experience in mind."
+  "Official mod support post launch?" (591772149598913940): nothing on co-op.
+- RPGWatch "mod support" thread: 403 to automated fetches, not read.
+- GitHub: repos for "tainted grail" sorted by update (30 newest, to 2026-10-19), topic
+  `tainted-grail`, "avalon coop", code search `Awaken.TG.Main`: no co-op. BepInEx mods worth
+  knowing: `keenanselbee/grailwright` (shared build/validation tooling), `Merlynn/TaintedGrail-
+  Companion_Tela` (companion, not read), `ParavozPendos/*` (IL2CPP and Mono). Several repos
+  named "free full version", "trainer undetected", "cheats" look like download lures: not
+  opened.
+- Author's other work: "hektormenta" finds nothing outside the Nexus page.
+- Same engine: covered in the first pass (engine-families.md Unity row).
+- Still not checked: the game's Discord (needs `playbook/discord-export.md` and the owner),
+  archive.org.
 
 ## Decision: build from zero, not revive TGCoop (owner's decision, recorded 2026-10-19)
 
