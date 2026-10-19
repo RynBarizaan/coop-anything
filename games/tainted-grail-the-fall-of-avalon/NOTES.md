@@ -224,6 +224,7 @@ What TGCoop players report, the cause where its code shows one, and what our des
 
 | Date | Milestone | Test | Result |
 |---|---|---|---|
+| 2026-10-19 | Testing gaps from the playbook filled: bad network (relay, 100 ms each way, 20 ms jitter, 5% loss) and exit (guest quits through the game's exit, host sees it leave, host quits, no crash report) | `run-suite.ps1 -Full`: new bad-network run; exit ends every run; twins "guest crashes" and "relay clean" | Over a real 108 ms / 5.1% loss link all in-session checks pass; host noticed the guest's exit by timeout. SUITE: PASS in 457 s (3 runs; twin run failed on exactly its 12 listed checks). |
 | 2026-10-19 | Test suite restructured: one shared session runs every feature's checks; only save/reload and persistence restart games; twins with independent switches share one run; tiers `-Quick` / `-Full`; save folders reset to a pinned baseline each run | `tools/run-suite.ps1 -Quick` and `-Full`, same checks and twin expectations as before (duplicates merged) | Quick: SUITE: PASS in 95 s (22 checks). Full: SUITE: PASS in 327 s (main 34/34; twin run failed on exactly its 10 listed checks), was 659 s. |
 | 2026-10-19 | Seeing each other, step 1 (playbook stage 2): roster slots, 20 Hz player state (unreliable), host forwards; each remote player is the game's own third-person hero body with the hero-only components removed, snapshot-interpolated 100 ms behind; both directions | `tools/presence-test.ps1` + twin (guest sends nothing: fails on exactly the 4 host-side puppet checks), in `run-suite.ps1` | SUITE: PASS in 659 s (6 cases); guest walked 16.6 m, host's puppet ended 0.08 m away. Puppet is a T-posed default body for now. |
 | 2026-10-19 | Co-op save slots: hosting turns the world into its own co-op slot; on join the host saves it and sends the live world; guests' characters are stored in the host's save (as extra entries the game's domain cache carries through every save) and come back on the next join | `tools/run-suite.ps1`: join, persistence (join, change, save, both quit, rejoin), each with a mutation twin | SUITE: PASS in 470 s (4 cases); guest kept 777 gold across sessions, host 129. |
@@ -231,6 +232,20 @@ What TGCoop players report, the cause where its code shows one, and what our des
 | 2026-10-18 | Guest joins host over local UDP (LiteNetLib), receives the host's save (chunked, SHA-256 checked), loads it with its own character next to the host, both stable for 30 s | `tools/run-suite.ps1`: join test + mutation twin (join without character must fail on exactly the 3 character checks), two isolated installs on one PC | SUITE: PASS in 191 s, 10/10 checks per case. |
 
 ## Test setup lessons
+
+- **LiteNetLib's network simulation does nothing in the NuGet build.** `SimulateLatency` /
+  `SimulatePacketLoss` only work in DEBUG or `SIMULATE_NETWORK` builds; in the release 2.1.4
+  DLL the methods are empty (`[Conditional]`, decompiled `Base.cs`). Use a UDP relay between
+  the copies instead (ours: 127.0.0.1 relay with latency, jitter and loss, counting what it
+  really did) and check its counts, not the settings.
+- **The game's exit kills its own process.** `MenuUI.ExitGame` → `TitleScreenUI.Exit` saves
+  prefs, ends analytics and calls `WindowsKernelHelpers.KillCurrentProcess()`; no Unity quit
+  or destroy callback runs, so a mod can't rely on them. In tests the game closes about 3 s
+  after the command.
+- **Crash reports**: a Unity crash writes
+  `%LOCALAPPDATA%\Temp\Questline\Fall of Avalon\Crashes\Crash_<UTC time>\crash.dmp` (shared by
+  the real game and every test copy), with no dialog and no process left. Tests check for new
+  folders since the run started.
 
 - **Game launches dominate test time** (about 45 s per session start; checks take seconds).
   Run many features' checks in one shared session and restart games only for tests that need
